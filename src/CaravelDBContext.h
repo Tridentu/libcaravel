@@ -27,6 +27,8 @@ namespace CaravelPM {
     void FindPackagesInNamespace(std::string pNamespace);
     void FindPackagesInCategory(std::string category);
     std::string GetPackageLink(std::string packageName);
+    std::vector<CaravelPackageInfo> FindPackagesFromNameQuery(std::string query);
+  public:
     void ClearPackageRecords();
     void AddRecord(CaravelPackageInfo info);
     void MarkDone();

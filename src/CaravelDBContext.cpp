@@ -53,7 +53,8 @@ namespace CaravelPM {
   }
 
   std::string CaravelDBContext::FindNamespace(std::string packageName){
-    std::string data = std::string("Processing data:").c_str();
+    infos.clear();
+    std::string data = std::string("CALLBACK FUNCTION").c_str();
     char* errMsg = 0;
     std::string result;
     std::string sql = "SELECT * FROM packageinfo WHERE name=\'" + packageName + "\';";
@@ -81,7 +82,8 @@ namespace CaravelPM {
   }
 
   std::string CaravelDBContext::FindType(std::string packageName){
-    std::string data = std::string("Processing data:").c_str();
+    infos.clear();
+    std::string data = std::string("CALLBACK FUNCTION").c_str();
     char* errMsg = 0;
     std::string result;
     std::string sql = "SELECT * FROM packageinfo WHERE name=\'" + packageName + "\';";
@@ -109,8 +111,8 @@ namespace CaravelPM {
   }
 
   std::string CaravelDBContext::FindCategory(std::string packageName){
-    
-    std::string data = std::string("Processing data:").c_str();
+    infos.clear();
+    std::string data = std::string("CALLBACK FUNCTION").c_str();
     char* errMsg = 0;
     std::string result;
     std::string sql = "SELECT * FROM packageinfo WHERE name=\'" + packageName + "\';";
@@ -142,7 +144,8 @@ namespace CaravelPM {
   }
 
   void CaravelDBContext::FindPackagesOfType(std::string type){
-      std::string data = std::string("Processing data:").c_str();
+    infos.clear();
+    std::string data = std::string("CALLBACK FUNCTION").c_str();
     char* errMsg = 0;
     std::string result;
     std::string sql = "SELECT * FROM packageinfo WHERE pkgType=\'" + type + "\';";
@@ -166,7 +169,8 @@ namespace CaravelPM {
   }
 
    void CaravelDBContext::FindPackagesInNamespace(std::string pNamespace){
-      std::string data = std::string("Processing data:").c_str();
+     infos.clear();
+     std::string data = std::string("CALLBACK FUNCTION").c_str();
     char* errMsg = 0;
     std::string result;
     std::string sql = "SELECT * FROM packageinfo WHERE architecture=\'" + pNamespace + "\';";
@@ -185,7 +189,8 @@ namespace CaravelPM {
   }
 
    void CaravelDBContext::FindPackagesInCategory(std::string category){
-      std::string data = std::string("Processing data:").c_str();
+     infos.clear();
+     std::string data = std::string("CALLBACK FUNCTION").c_str();
     char* errMsg = 0;
     std::string result;
     std::string sql = "SELECT * FROM packageinfo WHERE category=\'" + category + "\';";
@@ -201,6 +206,25 @@ namespace CaravelPM {
       if(infos.empty())
 	return;
     }
+  }
+
+  std::vector<CaravelPackageInfo> CaravelDBContext::FindPackagesFromNameQuery(std::string query){
+    infos.clear();
+    std::string data = std::string("CALLBACK FUNCTION").c_str();
+    char* errMsg = 0;
+    std::string result;
+    std::string sql = "SELECT * FROM packageinfo WHERE name LIKE '%" + query + "%';";
+    int rc = sqlite3_exec(m_DB, sql.c_str(), dbCallback, (void*)data.c_str(), &errMsg);
+    if(rc != SQLITE_OK ){
+      std::cerr << "SQL error detected: " << errMsg << std::endl;
+      sqlite3_free(errMsg);
+      return infos;
+    } else {
+      int i = 0;
+      while(!done)
+        i++;;
+    }
+    return infos;
   }
 
 
@@ -224,7 +248,6 @@ namespace CaravelPM {
 }
 
 static int dbCallback(void* data, int argc, char **argv, char **colName){
-  infos.clear();
   std::map<std::string, std::string> propMap;
   int packageRecIndex = 0;
   done = false;
@@ -234,8 +257,7 @@ static int dbCallback(void* data, int argc, char **argv, char **colName){
       propMap[column] = std::string(argv[i] ? argv[i] : "NULL");
       packageRecIndex++;
     }
-    if(packageRecIndex % 5 == 0){
-      
+    if(packageRecIndex % 5 == 0 && packageRecIndex > 0){
       CaravelPM::CaravelPackageInfo info;
       info.Namespace = propMap["architecture"];
       info.PackageType = propMap["pkgType"];
