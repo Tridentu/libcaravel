@@ -6,7 +6,7 @@
 #include <sstream>
 #include <LuaCpp/LuaCpp.hpp>
 #include <filesystem>
-#include <mast_tk/core/LineUtils.h>
+#include <mast_tk/core/LineUtils.hpp>
 
 using namespace LuaCpp;
 using namespace LuaCpp::Engine;
