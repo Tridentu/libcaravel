@@ -1,6 +1,5 @@
-
+#pragma once
 #include "CaravelWriter.h"
-#include "CaravelUtils.h"
 
 namespace CaravelPM {
   class CaravelAuthor {

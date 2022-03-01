@@ -4,13 +4,11 @@
 #include <iostream>
 #include <filesystem>
 #include "CaravelDownloader.h"
+#include "CaravelUtils.h"
 
 namespace CaravelPM {
 
-  size_t writeData(void* ptr, size_t size, size_t nmemb, FILE *stream){
-    size_t written = fwrite(ptr, size, nmemb, stream);
-    return written;
-  };
+  
   
   CaravelDownloader::CaravelDownloader(std::string pkg, bool useDatabase){
     m_pkgName = pkg;
