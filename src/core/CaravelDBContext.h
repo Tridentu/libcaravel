@@ -12,6 +12,12 @@ namespace CaravelPM {
     std::string PackageType;
     std::string Description;
     std::string Namespace;
+    int Id;
+  };
+  
+  struct CaravelPackageId {
+    std::string PackageId;
+    int Id;
   };
   
   class CaravelDBContext {
@@ -22,12 +28,14 @@ namespace CaravelPM {
     std::string FindNamespace(std::string packageName);
     std::string FindType(std::string packageName);
     std::string FindCategory(std::string packageName);
+    CaravelPackageId* FindPackageId(CaravelPackageInfo packageInfo);
     std::vector<CaravelPackageInfo> GetPackageRecords();
     void FindPackagesOfType(std::string type);
     void FindPackagesInNamespace(std::string pNamespace);
     void FindPackagesInCategory(std::string category);
     std::string GetPackageLink(std::string packageName);
     std::vector<CaravelPackageInfo> FindPackagesFromNameQuery(std::string query);
+   std::vector<std::vector<std::string>>  FindPackageIdsFromNameQuery(std::string query);
   public:
     void ClearPackageRecords();
     void AddRecord(CaravelPackageInfo info);
