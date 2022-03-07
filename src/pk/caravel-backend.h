@@ -29,3 +29,4 @@ typedef struct {
     void pk_backend_get_repo_list(PkBackend *backend, PkBackendJob *job, PkBitfield filters);
     const gchar* pk_backend_get_author(PkBackend* backend);
     void pk_backend_search_names(PkBackend *backend, PkBackendJob *job, PkBitfield filters, gchar **values);
+    void pk_backend_get_updates(PkBackend *backend, PkBackendJob *job, PkBitfield filters);

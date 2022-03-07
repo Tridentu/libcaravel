@@ -5,6 +5,7 @@
 #include <iostream>
 #include <map>
 #include <sqlite3.h>
+#include <filesystem>
 #include "CaravelDownloader.h"
 
 static int dbCallback(void* data, int argc, char **argv, char **colName);
@@ -17,17 +18,17 @@ namespace CaravelPM {
 
   CaravelDBContext* CaravelDBContext::s_CurrentContext = nullptr;
 
-  void CaravelDBContext::InitDB(std::string databaseFile){
-    s_CurrentContext = new CaravelDBContext(databaseFile);
+  void CaravelDBContext::InitDB(std::string databaseFile, bool useTemp){
+    s_CurrentContext = new CaravelDBContext(databaseFile, useTemp);
   }
 
   CaravelDBContext* CaravelDBContext::GetDB(){
     return s_CurrentContext;
   }
   
-  CaravelDBContext::CaravelDBContext(std::string databaseFile){
+  CaravelDBContext::CaravelDBContext(std::string databaseFile, bool useTemp){
     m_dbFile = databaseFile;
-    Init();
+    Init(useTemp);
   }
 
   CaravelDBContext::~CaravelDBContext(){
@@ -35,23 +36,36 @@ namespace CaravelPM {
     
   }
 
-  void CaravelDBContext::Init(){
+  void CaravelDBContext::Init(bool temp, bool debug){
     std::string dbPath = m_dbFile;
     if(m_dbFile.find("https") != std::string::npos){
-      std::cout << "Downloading Repository Database..." << std::endl;
-      CaravelDownloader* downl = new CaravelDownloader("database", true);
+      if(debug){
+          std::cout << "Downloading Repository Database..." << std::endl;
+      }
+      CaravelDownloader* downl = new CaravelDownloader("database", true, temp);
       downl->Run();
-      dbPath = std::string(getenv("HOME"));
-      dbPath += "/pman.caraveldb";
+
+      if(temp)
+          dbPath = "/tmp/pman.caravel.db";
+      else {
+        dbPath = std::string(getenv("HOME"));
+        dbPath += "/pman.caraveldb";
+      }
       m_dbFile = dbPath;
-      std::cout << "Database Downloaded." << std::endl;
+      if(debug){
+         std::cout << "Database Downloaded." << std::endl;
+      }
     }
     int rc = sqlite3_open(m_dbFile.c_str(), &m_DB);
     if (rc){
-      std::cerr << "Can't use manifest." << std::endl;
+      if(debug) {
+          std::cerr << "Can't use manifest." << std::endl;
+      }
       exit(0);
     } else {
-      std::cout << "Opened repo manifest successfully." << std::endl;
+      if(debug){
+          std::cout << "Opened repo manifest successfully." << std::endl;
+      }
     }
   }
 
@@ -59,7 +73,7 @@ namespace CaravelPM {
     infos.clear();
     std::string data = std::string("CALLBACK FUNCTION").c_str();
     char* errMsg = 0;
-    std::string result;
+    std::string result = "";
     std::string sql = "SELECT * FROM packageinfo WHERE name=\'" + packageName + "\';";
     int rc = sqlite3_exec(m_DB, sql.c_str(), dbCallback, (void*)data.c_str(), &errMsg);
     if(rc != SQLITE_OK ){
@@ -83,12 +97,13 @@ namespace CaravelPM {
     }
     return result;
   }
+  
 
   std::string CaravelDBContext::FindType(std::string packageName){
     infos.clear();
     std::string data = std::string("CALLBACK FUNCTION").c_str();
     char* errMsg = 0;
-    std::string result;
+    std::string result = "";
     std::string sql = "SELECT * FROM packageinfo WHERE name=\'" + packageName + "\';";
     int rc = sqlite3_exec(m_DB, sql.c_str(), dbCallback, (void*)data.c_str(), &errMsg);
     if(rc != SQLITE_OK ){
@@ -121,6 +136,7 @@ namespace CaravelPM {
     std::stringstream ss;
     ss << "SELECT * FROM packagekit_ids WHERE package_table_id=" << packageInfo.Id << ";";
     std::string sql = ss.str();
+    std::cout << sql << std::endl;
     int rc = sqlite3_exec(m_DB, sql.c_str(), dbCallbackPkgId, (void*)data.c_str(), &errMsg);
     if(rc != SQLITE_OK ){
       std::cerr << "SQL error detected: " << errMsg << std::endl;
@@ -148,7 +164,7 @@ namespace CaravelPM {
     infos.clear();
     std::string data = std::string("CALLBACK FUNCTION").c_str();
     char* errMsg = 0;
-    std::string result;
+    std::string result = "";
     std::string sql = "SELECT * FROM packageinfo WHERE name=\'" + packageName + "\';";
     int rc = sqlite3_exec(m_DB, sql.c_str(), dbCallback, (void*)data.c_str(), &errMsg);
     if(rc != SQLITE_OK ){
@@ -181,7 +197,7 @@ namespace CaravelPM {
     infos.clear();
     std::string data = std::string("CALLBACK FUNCTION").c_str();
     char* errMsg = 0;
-    std::string result;
+    std::string result = "";
     std::string sql = "SELECT * FROM packageinfo WHERE pkgType=\'" + type + "\';";
     int rc = sqlite3_exec(m_DB, sql.c_str(), dbCallback, (void*)data.c_str(), &errMsg);
     if(rc != SQLITE_OK ){
@@ -206,7 +222,7 @@ namespace CaravelPM {
      infos.clear();
      std::string data = std::string("CALLBACK FUNCTION").c_str();
     char* errMsg = 0;
-    std::string result;
+    std::string result = "";
     std::string sql = "SELECT * FROM packageinfo WHERE architecture=\'" + pNamespace + "\';";
     int rc = sqlite3_exec(m_DB, sql.c_str(), dbCallback, (void*)data.c_str(), &errMsg);
     if(rc != SQLITE_OK ){
@@ -226,7 +242,7 @@ namespace CaravelPM {
      infos.clear();
      std::string data = std::string("CALLBACK FUNCTION").c_str();
     char* errMsg = 0;
-    std::string result;
+    std::string result = "";
     std::string sql = "SELECT * FROM packageinfo WHERE category=\'" + category + "\';";
     int rc = sqlite3_exec(m_DB, sql.c_str(), dbCallback, (void*)data.c_str(), &errMsg);
     if(rc != SQLITE_OK ){
@@ -242,11 +258,45 @@ namespace CaravelPM {
     }
   }
 
+   std::vector<CaravelPackageInfo> CaravelDBContext::GetAllPackages(){
+    infos.clear();
+    std::string data = std::string("CALLBACK FUNCTION").c_str();
+    char* errMsg = 0;
+    std::string result = "";
+    std::string sql = "SELECT * FROM packageinfo;";
+    int rc = sqlite3_exec(m_DB, sql.c_str(), dbCallback, (void*)data.c_str(), &errMsg);
+    if(rc != SQLITE_OK ){
+      std::cerr << "SQL error detected: " << errMsg << std::endl;
+      sqlite3_free(errMsg);
+      return infos;
+    } else {
+      int i = 0;
+      while(!done)
+        i++;;
+    }
+    return infos;
+  }
+  
+  std::vector<CaravelInstalledPackage> CaravelDBContext::GetInstalledPackages()
+    {
+       std::vector<CaravelPackageInfo> packageInfos =  GetAllPackages();
+       std::vector<CaravelInstalledPackage> packages;
+       for (const CaravelPackageInfo& package : packageInfos){
+        if (std::filesystem::exists(std::filesystem::path("/usr/share/caravel-uninstall/" + package.PackageName + ".lua"))){
+           CaravelInstalledPackage pack = CaravelInstalledPackage();
+           pack.name = package.PackageName;
+           packages.push_back(pack);
+        }
+       }
+       return packages;
+    }
+
+  
   std::vector<CaravelPackageInfo> CaravelDBContext::FindPackagesFromNameQuery(std::string query){
     infos.clear();
     std::string data = std::string("CALLBACK FUNCTION").c_str();
     char* errMsg = 0;
-    std::string result;
+    std::string result = "";
     std::string sql = "SELECT * FROM packageinfo WHERE name LIKE '%" + query + "%';";
     int rc = sqlite3_exec(m_DB, sql.c_str(), dbCallback, (void*)data.c_str(), &errMsg);
     if(rc != SQLITE_OK ){

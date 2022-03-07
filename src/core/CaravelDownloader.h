@@ -7,7 +7,7 @@ namespace CaravelPM {
   class CaravelDownloader {
 
   public:
-    CaravelDownloader(std::string pkg, bool useDatabase = false);
+    CaravelDownloader(std::string pkg, bool useDatabase = false, bool useTempFolder = false);
     CaravelDownloader(std::string pkg, std::string pkgUrl);
     ~CaravelDownloader();
     void Run();
@@ -16,6 +16,7 @@ namespace CaravelPM {
     int m_Running = 1;
     std::string m_URL;
     bool isDatabase;
+    bool m_UseTemp = false;
     std::string m_pkgName;
   };
 }

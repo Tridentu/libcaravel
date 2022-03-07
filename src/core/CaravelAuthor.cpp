@@ -7,7 +7,7 @@
 
 namespace CaravelPM {
 
-  void CaravelAuthor::CreatePackage(std::string pkgName, CaravelPkgType type){
+  void CaravelAuthor::CreatePackage(std::string pkgName, CaravelPkgType type, std::map<std::string, std::string> extraProps){
     CaravelWriter* cw = new CaravelWriter(pkgName,type);
     std::filesystem::path pkgPath = std::filesystem::current_path();
     pkgPath += "/";
@@ -33,6 +33,10 @@ namespace CaravelPM {
     case CaravelPkgType::Assets:
       cw->SetMetadata("type","assets");
       break;
+    }
+
+    for (auto const& [key, val] : extraProps){
+        cw->SetMetadata(key, val);
     }
     
    

@@ -10,9 +10,10 @@ namespace CaravelPM {
 
   
   
-  CaravelDownloader::CaravelDownloader(std::string pkg, bool useDatabase){
+  CaravelDownloader::CaravelDownloader(std::string pkg, bool useDatabase, bool useTempFolder){
     m_pkgName = pkg;
     std::stringstream urlS;
+    m_UseTemp = useTempFolder;
     isDatabase = useDatabase;
     if (!useDatabase)
       urlS << "https://tridentu.github.io/acquirium/packages/x86_64/" << pkg << ".caravel";
@@ -34,7 +35,10 @@ namespace CaravelPM {
 	FILE* fp;
 	std::stringstream filenameS;
 	if(isDatabase)
-	  filenameS << getenv("HOME") <<  "/pman.caraveldb";
+        if(!m_UseTemp)
+            filenameS << getenv("HOME") <<  "/pman.caraveldb";
+        else
+            filenameS << "/tmp/pman.caraveldb";
 	else
 	  filenameS << getenv("HOME") << "/" <<  m_pkgName << ".caravel";
 	CURLcode res;

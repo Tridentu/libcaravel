@@ -166,6 +166,9 @@ namespace CaravelPM {
       m_Type = CaravelPkgType::Source;
     }
         
+
+    m_BuildType = reader.GetString("caravel","buildType","regular");
+
     CaravelContext* ctx = new CaravelContext(installPath.string());
     ctx->Run();
 
@@ -194,6 +197,10 @@ namespace CaravelPM {
     
   }
 
+
+  bool CaravelReader::hasHybridType(){
+      return m_BuildType == "hybrid";
+  }
 
   std::string CaravelReader::GetMetadata(std::string key){
     return m_Metadata[key];
