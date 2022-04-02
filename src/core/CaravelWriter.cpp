@@ -16,7 +16,7 @@
 #include <fstream>
 
 namespace CaravelPM {
-  CaravelWriter::CaravelWriter(std::string pkgName, CaravelPkgType type){
+  CaravelWriter::CaravelWriter(std::string pkgName, std::string type){
     m_Name = pkgName;
     m_Type = type;
     m_Archive = archive_write_new();

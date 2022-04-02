@@ -7,33 +7,22 @@
 
 namespace CaravelPM {
 
-  void CaravelAuthor::CreatePackage(std::string pkgName, CaravelPkgType type, std::map<std::string, std::string> extraProps){
+  void CaravelAuthor::CreatePackage(std::string pkgName, std::string type, std::map<std::string, std::string> extraProps, CaravelTypeLoader* newLoader){
+    if(!newLoader)
+        return;
     CaravelWriter* cw = new CaravelWriter(pkgName,type);
     std::filesystem::path pkgPath = std::filesystem::current_path();
     pkgPath += "/";
     pkgPath += pkgName;
     cw->SetMetadata("name",pkgName);
-    switch(type){
-    case CaravelPkgType::Binaries:
-      cw->SetMetadata("type","binaries");
-       for (const auto & entry : std::filesystem::recursive_directory_iterator((pkgPath / "install"))){
-	 cw->AddFile(entry.path().c_str(), std::string(std::filesystem::relative(entry.path(),(pkgPath)).c_str()));
-       }
-      break;
-    case CaravelPkgType::Source:
-      cw->SetMetadata("type","sources");
-      
-      break;
-    case CaravelPkgType::DotFiles:
-      cw->SetMetadata("type","config");
-       for (const auto & entry : std::filesystem::recursive_directory_iterator((pkgPath / "dotfiles"))){
-	 cw->AddFile(entry.path().c_str(), std::string(std::filesystem::relative(entry.path(),(pkgPath)).c_str()));
-       }
-      break;
-    case CaravelPkgType::Assets:
-      cw->SetMetadata("type","assets");
-      break;
+    auto packageType = newLoader->getPackageType(type);
+    if(!packageType.name.empty()){
+        cw->SetMetadata("type",type);
+        packageType.processFiles(pkgPath, [&](const char* path1, const char* path2){
+            cw->AddFile(path1, path2);
+        });
     }
+  
 
     for (auto const& [key, val] : extraProps){
         cw->SetMetadata(key, val);

@@ -13,7 +13,7 @@ namespace CaravelPM {
   
   class CaravelReader {
   public:
-    CaravelReader(std::string pkgFile, std::string name);
+    CaravelReader(std::string pkgFile, std::string name, CaravelTypeLoader* newLoader);
     bool Extract();
     bool  Install();
     int CopyFile(struct archive* a, struct archive *w);
@@ -29,7 +29,8 @@ namespace CaravelPM {
     std::string m_File;
     std::string m_Name;
     std::map<std::string, std::string> m_Metadata;
-    CaravelPkgType m_Type;
+    std::string m_Type;
     std::string m_BuildType = "regular";
+    CaravelTypeLoader* m_Loader;
   };
 }

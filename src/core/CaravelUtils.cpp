@@ -1,5 +1,7 @@
 
 #include "CaravelUtils.h"
+
+#include "CaravelTypeLoader.hpp"
 namespace CaravelPM {
      size_t writeData(void* ptr, size_t size, size_t nmemb, FILE *stream){
         size_t written = fwrite(ptr, size, nmemb, stream);
@@ -14,5 +16,7 @@ namespace CaravelPM {
             exit(1);
         }
     }
-
+    CaravelTypeLoader* InitLoader() {
+        return new CaravelTypeLoader();
+    }
 }

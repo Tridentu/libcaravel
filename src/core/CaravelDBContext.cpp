@@ -46,7 +46,7 @@ namespace CaravelPM {
       downl->Run();
 
       if(temp)
-          dbPath = "/tmp/pman.caravel.db";
+          dbPath = "/tmp/pman.caraveldb";
       else {
         dbPath = std::string(getenv("HOME"));
         dbPath += "/pman.caraveldb";
@@ -129,7 +129,7 @@ namespace CaravelPM {
   }
   
   CaravelPackageId* CaravelDBContext::FindPackageId(CaravelPackageInfo packageInfo){
-    infos.clear();
+    ids.clear();
     std::string data = std::string("CALLBACK FUNCTION").c_str();
     char* errMsg = 0;
     CaravelPackageId* result;
@@ -146,11 +146,11 @@ namespace CaravelPM {
       int i = 0;
       while(!done)
         i++;
-      if(infos.empty())
+      if(ids.empty())
         return nullptr;
       CaravelPackageId* record;
-      for (int i = 0; i < infos.size(); ++i){
-        if (!infos.at(i).Namespace.empty()){
+      for (int i = 0; i < ids.size(); i++){
+        if (!ids.at(i).PackageId.empty()){
             record = &ids.at(i);
             break;
         }
@@ -272,7 +272,7 @@ namespace CaravelPM {
     } else {
       int i = 0;
       while(!done)
-        i++;;
+        i++;
     }
     return infos;
   }
@@ -377,11 +377,11 @@ static int dbCallbackPkgId(void* data, int argc, char **argv, char **colName){
   done = false;
   for(int i = 0; i < argc; i++){
     std::string column(colName[i]);
-    if(column == "package_table_id" || column == "package_id"){
+    if(column == "package_table_id" || column == "package_id" || column == "record_id"){
       propMap[column] = std::string(argv[i] ? argv[i] : "NULL");
       packageRecIndex++;
     }
-    if(packageRecIndex % 2 == 0 && packageRecIndex > 0){
+    if(packageRecIndex % 3 == 0 && packageRecIndex > 0){
       CaravelPM::CaravelPackageId info;
       info.PackageId = propMap["package_id"];
       info.Id = std::stoi(propMap["package_table_id"]);

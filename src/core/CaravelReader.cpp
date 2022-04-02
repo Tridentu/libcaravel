@@ -31,9 +31,10 @@ static int parse_manifest(void* user, const char* section, const char* name, con
 
 namespace CaravelPM {
 
-  CaravelReader::CaravelReader(std::string pkgFile, std::string name){
+  CaravelReader::CaravelReader(std::string pkgFile, std::string name, CaravelTypeLoader* newLoader){
     m_File = pkgFile;
     m_Name = name;
+    m_Loader = newLoader;
   }
 
   std::string CaravelReader::RunCommand(const char* command){
@@ -155,37 +156,13 @@ namespace CaravelPM {
       return false;
     }
 
-    if (std::string(reader.GetString("caravel","type","binaries")) == "binaries") {
-      m_Type = CaravelPkgType::Binaries;
-      
-    } else if (std::string(reader.GetString("caravel","type","binaries")) == "config"){
-      m_Type = CaravelPkgType::DotFiles;
-    } else if (std::string(reader.GetString("caravel","type","binaries"))  == "assets"){
-      m_Type = CaravelPkgType::Assets;
-    } else if (std::string(reader.GetString("caravel","type","binaries")) == "sources"){
-      m_Type = CaravelPkgType::Source;
-    }
-        
-
+    m_Type = std::string(reader.GetString("caravel","type","binaries"));
     m_BuildType = reader.GetString("caravel","buildType","regular");
 
     CaravelContext* ctx = new CaravelContext(installPath.string());
     ctx->Run();
-
-    if(m_Type == CaravelPkgType::Binaries){
-      std::filesystem::path uninstallPath("/usr/share/caravel-uninstall/");
-      std::string uninstallFile (reader.GetString("caravel","name","unknown"));
-      uninstallFile += ".lua";
-      uninstallPath /= uninstallFile;
-      if(std::filesystem::exists(uninstallPath)){
-	std::filesystem::remove(uninstallPath);
-      }
-      std::filesystem::copy_file(folder + "uninstall.lua",uninstallPath);
-    } else {
-      return false;
-    }
-
-    return true;
+    auto packageType = m_Loader->getPackageType(m_Type);
+    return packageType.processInstallUninstaller(reader.GetString("caravel","name","unknown"));
     
   }
 
