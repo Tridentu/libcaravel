@@ -15,7 +15,7 @@ extern "C" {
         return "config";
     }
     
-    bool process_iu(std::string packageName){
+    bool process_iu(std::string packageName,std::filesystem::path newInstallPath){
       return true;
     }
     

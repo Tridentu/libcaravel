@@ -162,7 +162,12 @@ namespace CaravelPM {
     CaravelContext* ctx = new CaravelContext(installPath.string());
     ctx->Run();
     auto packageType = m_Loader->getPackageType(m_Type);
-    return packageType.processInstallUninstaller(reader.GetString("caravel","name","unknown"));
+    std::filesystem::path uninstallPath(folder + "uninstall.lua");
+    if (!std::filesystem::exists(uninstallPath)){
+          std::cerr << "Uninstaller does not exist, exiting..." << std::endl;
+      return false;
+    }
+    return packageType.processInstallUninstaller(reader.GetString("caravel","name","unknown"), uninstallPath);
     
   }
 

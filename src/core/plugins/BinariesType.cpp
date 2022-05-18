@@ -11,7 +11,7 @@ extern "C" {
         return "binaries";
     }
     
-    bool process_iu(std::string packageName){
+    bool process_iu(std::string packageName, std::filesystem::path newInstallPath){
       std::filesystem::path uninstallPath("/usr/share/caravel-uninstall/");
       std::string uninstallFile (packageName);
       uninstallFile += ".lua";
@@ -19,6 +19,7 @@ extern "C" {
       if(std::filesystem::exists(uninstallPath)){
         std::filesystem::remove(uninstallPath);
       }
+      std::filesystem::copy(newInstallPath, uninstallPath);
       return true;
         
     }

@@ -280,6 +280,44 @@ static void pk_backend_search_names_thread(PkBackendJob *job, GVariant *params, 
 
 }
 
+static void pk_backend_search_details_thread(PkBackendJob *job, GVariant *params, gpointer user_data){
+    PkRoleEnum role;
+	PkBitfield filters;
+    g_autofree gchar **search = NULL;
+
+	role = pk_backend_job_get_role (job);
+	
+		g_variant_get (params, "(t^a&s)",
+			       &filters,
+			       &search);
+
+    if (search){
+        std::vector<std::vector<std::string>>  package_ids = findPackageIdsFromNameQuery(std::string(search[0]));
+
+       if(package_ids.size() <= 0){
+        pk_backend_job_error_code (job, PK_ERROR_ENUM_PACKAGE_NOT_FOUND, "No packages found (packages were non-existent from query %s).", search[0]);
+         pk_backend_job_finished (job);
+
+         return;
+       }
+       std::ofstream fs1;
+       fs1.open("/tmp/caravel-pk.log");
+       fs1 << "Starting results..." << std::endl;
+       for (int i = 0; i < package_ids.size(); i++){
+        
+            fs1 << package_ids.at(i).at(0).c_str() << std::endl;
+            std::string idStr = package_ids.at(i).at(0);
+            fs1 << idStr.substr(0,idStr.size() - 1).c_str() << std::endl;
+            pk_backend_job_package(job, PK_INFO_ENUM_AVAILABLE, (const gchar*)idStr.substr(0,idStr.size() - 1).c_str(), (const gchar*)package_ids.at(i).at(1).c_str());
+       }
+       fs1.close();
+    } else {
+         pk_backend_job_error_code (job, PK_ERROR_ENUM_PACKAGE_NOT_FOUND, "No packages found (search was empty)."); 
+
+    }
+
+
+}
 
 void pk_backend_search_names(PkBackend *backend, PkBackendJob *job, PkBitfield filters, gchar **values){
     pk_backend_job_set_allow_cancel(job, TRUE);
@@ -288,7 +326,12 @@ void pk_backend_search_names(PkBackend *backend, PkBackendJob *job, PkBitfield f
     
 }
 
-
+void pk_backend_search_details(PkBackend *backend, PkBackendJob *job, PkBitfield filters, gchar **values){
+    pk_backend_job_set_allow_cancel(job, TRUE);
+    pk_backend_job_set_status(job, PK_STATUS_ENUM_QUERY);
+    pk_backend_job_thread_create(job, pk_backend_search_details_thread, NULL, NULL);
+    
+}
 
 static gboolean
 pk_backend_get_updates_timeout (gpointer data)
