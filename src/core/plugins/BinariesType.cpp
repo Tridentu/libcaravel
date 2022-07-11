@@ -11,6 +11,10 @@ extern "C" {
         return "binaries";
     }
     
+    const char* ver_dir(){
+        return "x86_64";
+    }
+    
     bool process_iu(std::string packageName, std::filesystem::path newInstallPath){
       std::filesystem::path uninstallPath("/usr/share/caravel-uninstall/");
       std::string uninstallFile (packageName);

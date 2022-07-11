@@ -11,6 +11,7 @@ option(WITH_BACKEND "Builds the Caravel PackageKit backend." OFF)
 
 option(WITH_BIN_TYPE "Builds the Caravel Binary Type plugin." OFF)
 option(WITH_CONFIG_TYPE "Builds the Caravel Dotfile Type Plugin backend." OFF)
+option(WITH_ASSETS_TYPE "Builds the Caravel Assets Type Plugin backend." OFF)
 
 
 include_directories("./src")
@@ -77,9 +78,19 @@ endif()
 
 if (WITH_CONFIG_TYPE)
     set(CVL_CONFIG_SRC src/core/plugins/ConfigType.cpp)
-    target_include_directories(caravel_binary_type PUBLIC $<INSTALL_INTERFACE:include/caravel>)
     add_library(caravel_config_type SHARED ${CVL_CONFIG_SRC})
+    target_include_directories(caravel_config_type PUBLIC $<INSTALL_INTERFACE:include/caravel>)
     target_link_libraries(caravel_config_type
+        PRIVATE
+        CaravelLib
+    )
+endif()
+
+if (WITH_ASSETS_TYPE)
+    set(CVL_ASSETS_SRC src/core/plugins/AssetsType.cpp)
+    add_library(caravel_assets_type SHARED ${CVL_ASSETS_SRC})
+    target_include_directories(caravel_assets_type PUBLIC $<INSTALL_INTERFACE:include/caravel>)
+    target_link_libraries(caravel_assets_type
         PRIVATE
         CaravelLib
     )
@@ -98,4 +109,7 @@ if(WITH_BIN_TYPE)
 endif()
 if(WITH_CONFIG_TYPE)
     install(TARGETS caravel_config_type DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/caravel-plugins)
+endif()
+if(WITH_ASSETS_TYPE)
+    install(TARGETS caravel_assets_type DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/caravel-plugins)
 endif()

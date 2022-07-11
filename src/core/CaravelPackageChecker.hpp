@@ -16,7 +16,7 @@ namespace CaravelPM {
         CaravelPackageChecker(std::string packageName, bool isLocalFile = false, std::string packageName_Global = "");
         ~CaravelPackageChecker();
     public:
-        void LoadSignatureAndContents(bool downloadFirst = false);
+        void LoadSignatureAndContents(bool downloadFirst = false, std::string arch = "x86_64");
         bool Verify();
         
     private:

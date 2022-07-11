@@ -18,12 +18,12 @@ namespace CaravelPM {
         }
     }
 
-    void CaravelPackageChecker::LoadSignatureAndContents(bool downloadFirst)
+    void CaravelPackageChecker::LoadSignatureAndContents(bool downloadFirst, std::string arch)
     {
         
         if (downloadFirst){
             std::stringstream url;
-            url << "https://tridentu.github.io/acquirium/sigs/x86_64/" << m_packageName << ".caravel.sig";
+            url << "https://tridentu.github.io/acquirium/sigs/" << arch << "/" << m_packageName << ".caravel.sig";
             m_HandleHttp = curl_easy_init();
             curl_easy_setopt(m_HandleHttp, CURLOPT_URL, url.str().c_str());
             m_SigHandleDown = fopen(m_signaturePath.c_str(), "w+");

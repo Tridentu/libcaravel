@@ -88,6 +88,16 @@ namespace CaravelPM {
 
                     }
                     dlerror();
+                     {
+                        caravel_type_verdir_t ver_dir = (caravel_type_verdir_t)((dlsym(so_obj, "ver_dir")));
+                        if (!ver_dir) {
+                            std::cerr << "Cannot load symbol ver_dir: " << dlerror() << '\n';
+                            continue;
+                        };
+                        pt.ver_dir = ver_dir;
+
+                    }
+                    dlerror();
                     packageTypes.insert(std::make_pair(pt.name,pt));
                     packageSOs.insert(std::make_pair(pt.name, so_obj));
 
