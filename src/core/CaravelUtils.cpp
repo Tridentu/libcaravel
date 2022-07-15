@@ -7,6 +7,8 @@ namespace CaravelPM {
         size_t written = fwrite(ptr, size, nmemb, stream);
         return written;
     }
+    
+    
   
    void CheckGPGMEError(gpgme_error_t err, std::string message)
     {

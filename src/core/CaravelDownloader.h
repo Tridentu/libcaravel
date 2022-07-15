@@ -2,8 +2,26 @@
 #pragma once 
 #include <curl/curl.h>
 #include <string>
+#include <indicatorslib.hpp>
 
 namespace CaravelPM {
+    
+    struct CaravelDLTInfo {
+        CURL* curl;
+        curl_off_t lastTick = 0;
+        float currProgress = 0.0f;
+        indicators::ProgressBar bar{
+            indicators::option::BarWidth{50},
+            indicators::option::Start{"["},
+            indicators::option::Fill{"■"},
+            indicators::option::Lead{"■"},
+            indicators::option::Remainder{"-"},
+            indicators::option::End{" ]"},
+            indicators::option::ForegroundColor{indicators::Color::cyan},
+            indicators::option::FontStyles{std::vector<indicators::FontStyle>{ indicators::FontStyle::bold}}
+        };
+    };
+    
   class CaravelDownloader {
 
   public:

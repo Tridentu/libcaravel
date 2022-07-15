@@ -21,6 +21,13 @@ namespace CaravelPM {
     int Id;
   };
   
+  struct CaravelPackageGroup {
+    std::string Group;
+    std::string Latest;
+    int Id;
+    std::string ToPackage();
+  };
+  
   struct CaravelInstalledPackage {
         std::string name;
         CaravelInstalledPackage() = default;
@@ -46,6 +53,8 @@ namespace CaravelPM {
     std::vector<CaravelPackageInfo> FindPackagesFromNameQuery(std::string query);
     std::vector<std::vector<std::string>>  FindPackageIdsFromNameQuery(std::string query);
     std::vector<CaravelInstalledPackage> GetInstalledPackages();
+    CaravelPackageGroup* GetPackageGroup(std::string groupName);
+
   public:
     void ClearPackageRecords();
     void AddRecord(CaravelPackageInfo info);

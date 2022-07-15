@@ -9,9 +9,10 @@ find_package(SQLite3 REQUIRED)
 
 option(WITH_BACKEND "Builds the Caravel PackageKit backend." OFF)
 
-option(WITH_BIN_TYPE "Builds the Caravel Binary Type plugin." OFF)
-option(WITH_CONFIG_TYPE "Builds the Caravel Dotfile Type Plugin backend." OFF)
-option(WITH_ASSETS_TYPE "Builds the Caravel Assets Type Plugin backend." OFF)
+option(WITH_BIN_TYPE "Builds the Caravel Binary Type Plugin." OFF)
+option(WITH_CONFIG_TYPE "Builds the Caravel Dotfile Type Plugin." OFF)
+option(WITH_ASSETS_TYPE "Builds the Caravel Assets Type Plugin." OFF)
+option(WITH_CARAVELSCRIPT "Builds the CaravelScript Interpreter." ON)
 
 
 include_directories("./src")
@@ -66,6 +67,18 @@ if (WITH_BACKEND)
         
 endif()
 
+if (WITH_CARAVELSCRIPT)
+    find_package(GTK2 REQUIRED)
+    file(GLOB CVL_CS_SRCS src/caravelscript/*.cpp)
+    include_directories(${GTK2_INCLUDE_DIRS})
+    add_executable(caravelscript ${CVL_CS_SRCS})
+    target_link_libraries(caravelscript
+        PRIVATE
+        CaravelLib
+    )
+        
+endif()
+
 if (WITH_BIN_TYPE)
     set(CVL_BINARY_SRC src/core/plugins/BinariesType.cpp)
     add_library(caravel_binary_type SHARED ${CVL_BINARY_SRC})
@@ -112,4 +125,7 @@ if(WITH_CONFIG_TYPE)
 endif()
 if(WITH_ASSETS_TYPE)
     install(TARGETS caravel_assets_type DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/caravel-plugins)
+endif()
+if(WITH_CARAVELSCRIPT)
+    install(TARGETS caravelscript DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 endif()

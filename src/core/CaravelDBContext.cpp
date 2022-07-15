@@ -10,10 +10,13 @@
 
 static int dbCallback(void* data, int argc, char **argv, char **colName);
 static int dbCallbackPkgId(void* data, int argc, char **argv, char **colName);
+static int dbCallbackPkgGroup(void* data, int argc, char **argv, char **colName);
 
 static bool done = false;
 static std::vector<CaravelPM::CaravelPackageInfo> infos;
 static std::vector<CaravelPM::CaravelPackageId> ids;
+static std::vector<CaravelPM::CaravelPackageGroup> groups;
+
 namespace CaravelPM {
 
   CaravelDBContext* CaravelDBContext::s_CurrentContext = nullptr;
@@ -311,6 +314,25 @@ namespace CaravelPM {
     return infos;
   }
   
+   CaravelPackageGroup* CaravelDBContext::GetPackageGroup(std::string groupName){
+            groups.clear();
+            std::string data = std::string("CALLBACK FUNCTION").c_str();
+            char* errMsg = 0;
+            std::string result = "";
+            std::string sql = "SELECT * FROM packagegroups WHERE package_group LIKE '%" + groupName + "%';";
+            int rc = sqlite3_exec(m_DB, sql.c_str(), dbCallbackPkgGroup, (void*)data.c_str(), &errMsg);
+            if(rc != SQLITE_OK ){
+                std::cerr << "SQL error detected: " << errMsg << std::endl;
+                sqlite3_free(errMsg);
+                return nullptr;
+            } else {
+                int i = 0;
+                while(!done)
+                    i++;;
+            }
+            return &groups[0];
+    }
+  
   std::vector<std::vector<std::string>>  CaravelDBContext::FindPackageIdsFromNameQuery(std::string query){
     std::vector<std::vector<std::string>> packageIds;
     std::vector<CaravelPackageInfo> pids = FindPackagesFromNameQuery(query);
@@ -342,6 +364,12 @@ namespace CaravelPM {
     m_Done = true;
   }
   
+  std::string CaravelPackageGroup::ToPackage()
+  {
+        return Group + "-" +  Latest;
+  }
+
+  
 }
 
 static int dbCallback(void* data, int argc, char **argv, char **colName){
@@ -363,6 +391,30 @@ static int dbCallback(void* data, int argc, char **argv, char **colName){
       info.PackageName = propMap["name"];
       info.Id = std::stoi(propMap["pkgId"]);
       infos.push_back(info);
+      propMap.clear();
+    }
+    
+  }
+  done = true;
+  return 0;
+}
+
+static int dbCallbackPkgGroup(void* data, int argc, char **argv, char **colName){
+  std::map<std::string, std::string> propMap;
+  int packageRecIndex = 0;
+  done = false;
+  for(int i = 0; i < argc; i++){
+    std::string column(colName[i]);
+    if(column == "package_group" || column == "latest" || column == "id"){
+      propMap[column] = std::string(argv[i] ? argv[i] : "NULL");
+      packageRecIndex++;
+    }
+    if(packageRecIndex % 3 == 0 && packageRecIndex > 0){
+      CaravelPM::CaravelPackageGroup info;
+      info.Group = propMap["package_group"];
+      info.Latest = propMap["latest"];
+      info.Id = std::stoi(propMap["id"]);
+      groups.push_back(info);
       propMap.clear();
     }
     
