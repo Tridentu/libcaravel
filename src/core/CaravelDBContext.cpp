@@ -349,7 +349,7 @@ namespace CaravelPM {
 
   std::string CaravelDBContext::GetPackageLink(std::string packageName){
     std::string pNamespace = FindNamespace(packageName);
-    return "https://tridentu.github.io/acquirium/packages/" + pNamespace + "/" + packageName + ".caravel";
+    return "https://tridentu.github.io/cmr/packages/" + pNamespace + "/" + packageName + ".caravel";
   }
   
   void CaravelDBContext::ClearPackageRecords(){

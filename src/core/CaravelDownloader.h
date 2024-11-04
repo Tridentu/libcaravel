@@ -34,7 +34,7 @@ namespace CaravelPM {
     int m_Running = 1;
     std::string m_URL;
     bool isDatabase;
-    bool m_UseTemp = false;
+    bool m_UseTemp = true;
     std::string m_pkgName;
   };
 }

@@ -22,7 +22,7 @@ namespace CaravelPM {
     m_Archive = archive_write_new();
     archive_write_add_filter_xz(m_Archive);
     archive_write_set_compression_xz(m_Archive);
-    archive_write_set_format_gnutar(m_Archive);
+    archive_write_set_format_pax_restricted(m_Archive);
       int flags;
     
     flags = ARCHIVE_EXTRACT_PERM;

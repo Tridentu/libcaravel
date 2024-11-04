@@ -30,9 +30,9 @@ extern "C" {
   
   static int _caravel_ctx_install(lua_State* ls){
     std::stringstream cmd;
-        std::string homeDir(getenv("HOME"));
+        std::string homeDir("/tmp/ccontainer/");
     cmd << "install -vDm " << lua_tonumber(ls, 1) << " ";
-    std::filesystem::path source(homeDir + "/ccontainer/");
+    std::filesystem::path source(homeDir);
     source /= std::string(lua_tostring(ls, 2));
     cmd << source.string() << " ";
     std::filesystem::path dest(std::string(lua_tostring(ls, 3)));
@@ -43,9 +43,9 @@ extern "C" {
   
    static int _caravel_ctx_install_font(lua_State* ls){
     std::stringstream cmd;
-    std::string homeDir(getenv("HOME"));
+    std::string homeDir("/tmp/ccontainer/");
     cmd << "install -vDm 0644 ";
-    std::filesystem::path source(homeDir + "/ccontainer/");
+    std::filesystem::path source(homeDir);
     source /= std::string(lua_tostring(ls, 1));
     cmd << source.string() << " ";
     std::filesystem::path dest("/usr/share/fonts/" + source.filename().string());
@@ -57,9 +57,9 @@ extern "C" {
 
   static int _caravel_ctx_installdcpy(lua_State* ls){
     std::stringstream cmd;
-    std::string homeDir(getenv("HOME"));
+    std::string homeDir("/tmp/ccontainer/");
     cmd << "cp -r " << " ";
-    std::filesystem::path source(homeDir + "/ccontainer/");
+    std::filesystem::path source(homeDir);
     source /= std::string(lua_tostring(ls, 1));
     cmd << source.string() << " ";
     std::filesystem::path dest(std::string(lua_tostring(ls, 2)));
@@ -120,7 +120,7 @@ extern "C" {
     std::stringstream cmd;
     cmd << "tic -xe  ";
     cmd << std::string(lua_tostring(ls, 1));
-    cmd << getenv("HOME") << " /ccontainer/" << std::string(lua_tostring(ls, 2));
+    cmd <<  "/tmp/ccontainer/" << std::string(lua_tostring(ls, 2));
     RunCommand(cmd.str().c_str());
     return 0;
   }

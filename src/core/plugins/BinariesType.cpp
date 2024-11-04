@@ -32,6 +32,14 @@ extern "C" {
         for (const auto & entry : std::filesystem::recursive_directory_iterator((pkgPath / "install"))){
                 addFile(entry.path().c_str(), std::string(std::filesystem::relative(entry.path(),(pkgPath))).c_str());
         }
+        {
+            const auto& entry = (pkgPath / "install.lua");
+            addFile(entry.c_str(), std::string(std::filesystem::relative(entry,(pkgPath))).c_str());
+        }
+        {
+            const auto& entry = (pkgPath / "uninstall.lua");
+            addFile(entry.c_str(), std::string(std::filesystem::relative(entry,(pkgPath))).c_str());
+        }
     }
 
     

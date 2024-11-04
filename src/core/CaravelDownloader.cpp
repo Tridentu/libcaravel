@@ -17,9 +17,9 @@ namespace CaravelPM {
     m_UseTemp = useTempFolder;
     isDatabase = useDatabase;
     if (!useDatabase)
-      urlS << "https://tridentu.github.io/acquirium/packages/x86_64/" << pkg << ".caravel";
+      urlS << "https://tridentu.github.io/cmr/packages/x86_64/" << pkg << ".caravel";
     else
-      urlS << "https://tridentu.github.io/acquirium/pman.caraveldb";
+      urlS << "https://tridentu.github.io/cmr/pman.caraveldb";
     m_HandleHttp = curl_easy_init();
     curl_easy_setopt(m_HandleHttp,CURLOPT_URL,urlS.str().c_str());
     
@@ -56,7 +56,7 @@ namespace CaravelPM {
         else
             filenameS << "/tmp/pman.caraveldb";
 	else
-	  filenameS << getenv("HOME") << "/" <<  m_pkgName << ".caravel";
+	  filenameS << "/tmp" << "/" <<  m_pkgName << ".caravel";
 	CURLcode res;
 	fp = fopen(filenameS.str().c_str(), "wb");
     indicators::show_console_cursor(false);

@@ -51,14 +51,17 @@ namespace CaravelPM {
   }
 
   bool CaravelReader::Extract(){
-    std::string folder = std::string(getenv("HOME"));
+    std::string folder  = std::string("/tmp");
     folder += "/ccontainer/";
     
 
     std::filesystem::path p = std::filesystem::current_path();
-    if(!std::filesystem::create_directory(std::filesystem::path(folder))){
-      return false;
+    if(!std::filesystem::exists(std::filesystem::path(folder))){
+      if(!std::filesystem::create_directory(std::filesystem::path(folder))){
+        return false;
+      }
     }
+
 
     std::filesystem::path containerPath(folder);
     
@@ -68,7 +71,7 @@ namespace CaravelPM {
     
     std::stringstream cmd;
     cmd <<  (containerPath / m_Name ).string();
-
+    std::cout << "Extracting " << cmd.str() << "...\n";
     {
       int r;
       archive_entry* entry;
@@ -136,7 +139,7 @@ namespace CaravelPM {
   }
 
   bool CaravelReader::Install(){
-    std::string folder = std::string(getenv("HOME"));
+    std::string folder = std::string("/tmp");
     folder += "/ccontainer/";
     std::filesystem::path installPath(folder + "install.lua");
     if(!std::filesystem::exists(installPath)){

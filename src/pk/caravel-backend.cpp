@@ -39,7 +39,7 @@ void pk_backend_initialize(GKeyFile *conf, PkBackend* backend){
  backendData = g_new(PkBackendCaravelPrivate, 1);
     backendData->dots_enabled = FALSE;
     backendData->firm_enabled = FALSE;
-    CaravelPM::CaravelDBContext::InitDB(std::string("https://tridentu.github.io/acquirium/pman.caraveldb"), true);
+    CaravelPM::CaravelDBContext::InitDB(std::string("https://tridentu.github.io/cmr/pman.caraveldb"), true);
 
 }
 

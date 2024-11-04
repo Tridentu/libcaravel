@@ -10,11 +10,11 @@ namespace CaravelPM {
         setlocale (LC_ALL, "");
         gpgme_set_locale (NULL, LC_CTYPE, setlocale (LC_CTYPE, NULL));
         m_packageName = packageName;
-        m_packagePath = (!isLocalFile) ? (std::string(getenv("HOME")) + "/ccontainer/" + std::string(m_packageName + ".caravel")) : m_packageName;
-        m_signaturePath = std::string(std::string(getenv("HOME")) + "/"  + std::string(m_packagePath.stem().string() + ".caravel.sig"));
+        m_packagePath = (!isLocalFile) ? ("/tmp/ccontainer/" + std::string(packageName_Global) + ".caravel") : m_packageName;
+        m_signaturePath = ("/tmp/"  + packageName_Global + ".caravel.sig");
         if(isLocalFile){
             m_packageName = packageName_Global;
-            m_signaturePath = std::string(std::string(getenv("HOME")) + "/"  + std::string(packageName_Global + ".caravel.sig"));
+            m_signaturePath = ("/tmp/"  + std::string(packageName_Global + ".caravel.sig"));
         }
     }
 
@@ -23,7 +23,7 @@ namespace CaravelPM {
         
         if (downloadFirst){
             std::stringstream url;
-            url << "https://tridentu.github.io/acquirium/sigs/" << arch << "/" << m_packageName << ".caravel.sig";
+            url << "https://tridentu.github.io/cmr/sigs/" << arch << "/" << m_packageName << ".caravel.sig";
             m_HandleHttp = curl_easy_init();
             curl_easy_setopt(m_HandleHttp, CURLOPT_URL, url.str().c_str());
             m_SigHandleDown = fopen(m_signaturePath.c_str(), "w+");
@@ -33,7 +33,7 @@ namespace CaravelPM {
             fclose(m_SigHandleDown);
             curl_easy_cleanup(m_HandleHttp);
         }
-        
+        std::cout << "Opening " << m_packagePath << "...\n";
         m_SigHandle = fopen(m_signaturePath.c_str(), "rb");
         if(!m_SigHandle){
             gpgme_error_t err = gpgme_error_from_syserror();
