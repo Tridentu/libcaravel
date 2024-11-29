@@ -37,7 +37,7 @@ namespace CaravelPM {
   
   class CaravelDBContext {
   public:
-    CaravelDBContext(std::string databaseFile, bool useTemp = false);
+    CaravelDBContext(std::string databaseFile, std::string packageRepos, bool useTemp = false);
     ~CaravelDBContext();
     void Init(bool temp = false, bool debug = false);
     std::string FindNamespace(std::string packageName);
@@ -60,7 +60,7 @@ namespace CaravelPM {
     void AddRecord(CaravelPackageInfo info);
     void MarkDone();
   public:
-    static void InitDB(std::string databaseFile, bool useTemp = false);
+    static void InitDB(std::string databaseFile, std::string packageRepos, bool useTemp = false);
     static CaravelDBContext* GetDB();
     static void Cleanup();
   private:
@@ -72,5 +72,6 @@ namespace CaravelPM {
     bool m_Done;
     std::vector<CaravelPackageInfo> m_PackageRecords;
     std::ofstream caravelLog;
+    std::string packageRepo;
   };
 };

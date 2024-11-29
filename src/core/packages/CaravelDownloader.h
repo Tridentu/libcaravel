@@ -13,11 +13,12 @@ namespace CaravelPM {
         indicators::ProgressBar bar{
             indicators::option::BarWidth{50},
             indicators::option::Start{"["},
-            indicators::option::Fill{"■"},
-            indicators::option::Lead{"■"},
-            indicators::option::Remainder{"-"},
+            indicators::option::Fill{"="},
+            indicators::option::Lead{">"},
+            indicators::option::Remainder{" "},
             indicators::option::End{" ]"},
-            indicators::option::ForegroundColor{indicators::Color::cyan},
+            indicators::option::PostfixText{"Downloading"},
+            indicators::option::ForegroundColor{indicators::Color::green},
             indicators::option::FontStyles{std::vector<indicators::FontStyle>{ indicators::FontStyle::bold}}
         };
     };
@@ -25,7 +26,7 @@ namespace CaravelPM {
   class CaravelDownloader {
 
   public:
-    CaravelDownloader(std::string pkg, bool useDatabase = false, bool useTempFolder = false);
+    CaravelDownloader(std::string pkg, std::string repo, bool useDatabase = false, bool useTempFolder = false, std::string pkgSpace = "/packages/x86_64/");
     CaravelDownloader(std::string pkg, std::string pkgUrl);
     ~CaravelDownloader();
     void Run();

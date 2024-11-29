@@ -9,7 +9,7 @@
 #include <INIReader.h>
 #include <sstream>
 #include <unistd.h>
-#include "CaravelUtils.h"
+#include "../CaravelUtils.h"
 #include "CaravelReader.h"
 #include "CaravelContext.h"
 

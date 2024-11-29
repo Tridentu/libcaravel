@@ -4,7 +4,7 @@
 #include <archive_entry.h>
 #include <string>
 #include <map>
-#include "CaravelUtils.h"
+#include "../CaravelUtils.h"
 
 namespace CaravelPM {
   class CaravelWriter {

@@ -6,6 +6,7 @@ find_package(PkgConfig REQUIRED)
 find_package(CURL REQUIRED)
 find_Package(LibArchive REQUIRED)
 find_package(SQLite3 REQUIRED)
+find_package(Boost REQUIRED)
 
 option(WITH_BACKEND "Builds the Caravel PackageKit backend." OFF)
 
@@ -21,13 +22,29 @@ include_directories(${CMAKE_INSTALL_PREFIX}/include/mast_tk/core)
 include_directories(${SQLITE3_INCLUDE_DIR})
 include_directories(${CMAKE_INSTALL_PREFIX}/include/readline)
 file(GLOB CVL_SRCS src/core/*.cpp)
-file(GLOB CVL_HDRS src/core/*.h src/core/*.hpp)
+file(GLOB CVL_SRCS_REP  src/core/repository/*.cpp)
+file(GLOB CVL_SRCS_PACK src/core/packages/*.cpp)
+
+file(GLOB CVL_HDRS
+src/core/*.hpp
+src/core/*.h
+
+)
+file(GLOB CVL_HDRS_PACK src/core/packages/*.h
+src/core/packages/*.hpp
+
+)
+file(GLOB CVL_HDRS_REP
+src/core/repository/*.h
+src/core/repository/*.hpp
+
+)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CM_FOLDER "cmake-3.22")
 set(caraveltarget CaravelLib)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
-add_library(CaravelLib SHARED ${CVL_SRCS} ${CVL_PA_SRCS})
+add_library(CaravelLib SHARED ${CVL_SRCS} ${CVL_PA_SRCS} ${CVL_SRCS_PACK} ${CVL_SRCS_REP})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 
@@ -48,6 +65,7 @@ target_link_libraries(
 	sqlite3
 	readline
 	dl
+	${Boost_LIBRARIES}
 	gpgme
 )
 
@@ -111,6 +129,8 @@ endif()
 
 install(TARGETS CaravelLib  DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 install(FILES ${CVL_HDRS} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/caravel/)
+install(FILES ${CVL_HDRS_PACK} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/caravel/packages)
+install(FILES ${CVL_HDRS_REP} DESTINATION ${CMAKE_INSTALL_PREFIX}/include/caravel/repository)
 
 install(FILES build/libcaravel.pc  DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig/)
 install(FILES build/FindCaravelLib.cmake  DESTINATION ${CMAKE_INSTALL_PREFIX}/share/${CM_FOLDER}/Modules)

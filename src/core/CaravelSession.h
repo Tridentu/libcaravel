@@ -1,11 +1,11 @@
 #pragma once
 
-#include "CaravelRepository.h"
+#include "repository/CaravelRepository.h"
 #include <string>
 #include <iostream>
 #include <vector>
-#include "CaravelTypeLoader.hpp"
-#include "CaravelReader.h"
+#include "packages/CaravelTypeLoader.hpp"
+#include "packages/CaravelReader.h"
 
 namespace CaravelPM {
     class CaravelSession {
@@ -13,7 +13,16 @@ namespace CaravelPM {
     public:
         CaravelSession();
     public:
+        /**
+         * Retrieves the url for which packages are retrieved.
+         */
         std::string GetDownloadUrl(std::string urlStub);
+        std::string GetRepoUrl();
+        /**
+         * Retrieves the "download directory" for the given package type.
+         */
+        std::string GetPackagePath(std::string packageType);
+    public:
         CaravelPackageType getPackageType(std::string typeName);
         void Create(std::string packageDir, CaravelPackageType packageType, std::map<std::string, std::string> propMap);
         bool ReadAndInstall(std::string pathString, std::string packageFile);

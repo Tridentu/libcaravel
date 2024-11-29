@@ -40,6 +40,12 @@ extern "C" {
     RunCommand(cmd.str().c_str());
     return 0;
   }
+
+  static int _caravel_ctx_update_fcache(lua_State* ls){
+    std::stringstream cmd;
+    RunCommand("fc-cache -fv");
+    return 0;
+  }
   
    static int _caravel_ctx_install_font(lua_State* ls){
     std::stringstream cmd;
@@ -149,6 +155,8 @@ namespace CaravelPM {
     m_CaravelLib = std::make_shared<LuaLibrary>("caravelInstall");
     m_CaravelLib->AddCFunction("install", _caravel_ctx_install);
     m_CaravelLib->AddCFunction("installFont", _caravel_ctx_install_font);
+    m_CaravelLib->AddCFunction("updateFontCache", _caravel_ctx_update_fcache);
+
     m_CaravelLib->AddCFunction("installLink", _caravel_ctx_install_link);
     m_CaravelLib->AddCFunction("installd", _caravel_ctx_installd);
     m_CaravelLib->AddCFunction("uninstall", _caravel_ctx_uninstall);

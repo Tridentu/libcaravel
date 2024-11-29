@@ -4,7 +4,7 @@
 #include <iostream>
 
 #include <string.h>
-#include "CaravelTypeLoader.hpp"
+#include "packages/CaravelTypeLoader.hpp"
 
 namespace CaravelPM {
 

@@ -98,6 +98,16 @@ namespace CaravelPM {
 
                     }
                     dlerror();
+                    {
+                        caravel_type_download_dir_t download_dir = (caravel_type_download_dir_t)((dlsym(so_obj, "download_dir")));
+                        if (!download_dir) {
+                            std::cerr << "Cannot load symbol download_dir: " << dlerror() << '\n';
+                            continue;
+                        };
+                        pt.download_dir = download_dir;
+
+                    }
+                    dlerror();
                     packageTypes.insert(std::make_pair(pt.name,pt));
                     packageSOs.insert(std::make_pair(pt.name, so_obj));
 

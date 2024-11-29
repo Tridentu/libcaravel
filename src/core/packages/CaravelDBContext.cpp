@@ -21,16 +21,17 @@ namespace CaravelPM {
 
   CaravelDBContext* CaravelDBContext::s_CurrentContext = nullptr;
 
-  void CaravelDBContext::InitDB(std::string databaseFile, bool useTemp){
-    s_CurrentContext = new CaravelDBContext(databaseFile, useTemp);
+  void CaravelDBContext::InitDB(std::string databaseFile, std::string packageRepos, bool useTemp){
+    s_CurrentContext = new CaravelDBContext(databaseFile, packageRepos, useTemp);
   }
 
   CaravelDBContext* CaravelDBContext::GetDB(){
     return s_CurrentContext;
   }
   
-  CaravelDBContext::CaravelDBContext(std::string databaseFile, bool useTemp){
+  CaravelDBContext::CaravelDBContext(std::string databaseFile, std::string packageRepos, bool useTemp){
     m_dbFile = databaseFile;
+    packageRepo = packageRepos;
     Init(useTemp);
   }
 
@@ -45,7 +46,7 @@ namespace CaravelPM {
       if(debug){
           std::cout << "Downloading Repository Database..." << std::endl;
       }
-      CaravelDownloader* downl = new CaravelDownloader("database", true, temp);
+      CaravelDownloader* downl = new CaravelDownloader(packageRepo, packageRepo, true, temp);
       downl->Run();
 
       if(temp)
@@ -349,7 +350,7 @@ namespace CaravelPM {
 
   std::string CaravelDBContext::GetPackageLink(std::string packageName){
     std::string pNamespace = FindNamespace(packageName);
-    return "https://tridentu.github.io/cmr/packages/" + pNamespace + "/" + packageName + ".caravel";
+    return packageRepo + "/packages/" + pNamespace + "/" + packageName + ".caravel";
   }
   
   void CaravelDBContext::ClearPackageRecords(){

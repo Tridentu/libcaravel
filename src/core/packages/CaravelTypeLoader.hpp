@@ -19,6 +19,8 @@ namespace CaravelPM {
       caravel_type_installu_t processInstallUninstaller;
       caravel_type_files_t processFiles;
       caravel_type_verdir_t ver_dir;
+      caravel_type_download_dir_t download_dir;
+
       CaravelPackageType(){};
       CaravelPackageType(const CaravelPackageType& other) = default;
     };

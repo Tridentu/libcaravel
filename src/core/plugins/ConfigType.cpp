@@ -1,7 +1,7 @@
 
 #pragma once 
 
-#include <caravel/CaravelTypePlugin.hpp>
+#include <caravel/packages/CaravelTypePlugin.hpp>
 #include <filesystem>
 #include <functional>
 #include <string>
@@ -17,6 +17,10 @@ extern "C" {
     
     const char* ver_dir(){
         return "dots";
+    }
+
+    std::string download_dir(std::string extraData){
+        return std::string("/packages/dots/").c_str();
     }
     
     bool process_iu(std::string packageName,std::filesystem::path newInstallPath){

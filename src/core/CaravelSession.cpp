@@ -1,8 +1,8 @@
 #include "CaravelSession.h"
 #include <INIReader.h>
 #include "CaravelUtils.h"
-#include "CaravelAuthor.h"
-#include "CaravelContext.h"
+#include "packages/CaravelAuthor.h"
+#include "packages/CaravelContext.h"
 
 CaravelPM::CaravelSession::CaravelSession()
 {
@@ -20,6 +20,12 @@ void CaravelPM::CaravelSession::Load()
     loader->loadAllTypes();
 }
 
+std::string CaravelPM::CaravelSession::GetPackagePath(std::string packageType)
+{
+    auto package_t = loader->getPackageType(packageType);
+    std::string download = package_t.download_dir();
+    return download;
+}
 
 std::string CaravelPM::CaravelSession::GetDownloadUrl(std::string urlStub)
 {
@@ -68,4 +74,8 @@ CaravelPM::CaravelReader * CaravelPM::CaravelSession::getReader(std::string path
     return new CaravelPM::CaravelReader(pathString, packageFile, loader);
 }
 
+std::string CaravelPM::CaravelSession::GetRepoUrl()
+{
+    return m_Repository->DownloadURI();
+}
 

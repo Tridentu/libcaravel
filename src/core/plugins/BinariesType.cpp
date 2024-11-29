@@ -1,8 +1,28 @@
 
-#include <caravel/CaravelTypePlugin.hpp>
+#include <caravel/packages/CaravelTypePlugin.hpp>
 #include <filesystem>
 #include <functional>
 #include <string>
+
+
+const char* getBuild() {
+    std::string arch;
+    // Use uname to get the machine architecture
+    if (system("uname -m > /tmp/arch.txt") == 0) {
+        FILE *fp = fopen("/tmp/arch.txt", "r");
+        if (fp) {
+            char buffer[256];
+            if (fgets(buffer, sizeof(buffer), fp) != NULL) {
+                arch = buffer;
+                arch.erase(arch.find_last_not_of("\n") + 1); // Remove trailing newline
+            }
+            fclose(fp);
+            remove("/tmp/arch.txt"); // Clean up temporary file
+        }
+    }
+    return arch.c_str();
+
+}
 
 extern "C" {
     
@@ -10,9 +30,16 @@ extern "C" {
     {
         return "binaries";
     }
+
+
     
     const char* ver_dir(){
-        return "x86_64";
+        return getBuild();
+    }
+
+    std::string download_dir(){
+        std::string downloadd = (std::string("/packages/") + std::string(getBuild() + std::string("/")));
+        return downloadd;
     }
     
     bool process_iu(std::string packageName, std::filesystem::path newInstallPath){

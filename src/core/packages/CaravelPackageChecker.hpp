@@ -6,7 +6,7 @@
 #include <string>
 #include <filesystem>
 #include <curl/curl.h>
-#include "CaravelUtils.h"
+#include "../CaravelUtils.h"
 
 
 
@@ -16,7 +16,7 @@ namespace CaravelPM {
         CaravelPackageChecker(std::string packageName, bool isLocalFile = false, std::string packageName_Global = "");
         ~CaravelPackageChecker();
     public:
-        void LoadSignatureAndContents(bool downloadFirst = false, std::string arch = "x86_64");
+        void LoadSignatureAndContents(std::string repo, bool downloadFirst = false,  std::string arch = "x86_64");
         bool Verify();
         
     private:

@@ -4,28 +4,29 @@
 #include <iostream>
 #include <filesystem>
 #include "CaravelDownloader.h"
-#include "CaravelUtils.h"
+#include "../CaravelUtils.h"
 
 namespace CaravelPM {
 
   
 
   
-  CaravelDownloader::CaravelDownloader(std::string pkg, bool useDatabase, bool useTempFolder){
+  CaravelDownloader::CaravelDownloader(std::string pkg, std::string repo, bool useDatabase, bool useTempFolder, std::string pkgSpace){
     m_pkgName = pkg;
     std::stringstream urlS;
     m_UseTemp = useTempFolder;
     isDatabase = useDatabase;
     if (!useDatabase)
-      urlS << "https://tridentu.github.io/cmr/packages/x86_64/" << pkg << ".caravel";
+      urlS <<  repo << pkgSpace << pkg << ".caravel";
     else
-      urlS << "https://tridentu.github.io/cmr/pman.caraveldb";
+      urlS << repo << "/pman.caraveldb";
+   std::cout << urlS.str() << std::endl;
     m_HandleHttp = curl_easy_init();
     curl_easy_setopt(m_HandleHttp,CURLOPT_URL,urlS.str().c_str());
     
   };
 
-  CaravelDownloader::CaravelDownloader(std::string pkg, std::string pkgUrl){
+  CaravelDownloader::CaravelDownloader(std::string pkg,  std::string pkgUrl){
     m_pkgName = pkg;
     isDatabase = false;
     m_HandleHttp = curl_easy_init();
@@ -50,13 +51,17 @@ namespace CaravelPM {
     void  CaravelDownloader::Run(){
 	FILE* fp;
 	std::stringstream filenameS;
-	if(isDatabase)
+	if(isDatabase){
         if(!m_UseTemp)
             filenameS << getenv("HOME") <<  "/pman.caraveldb";
         else
             filenameS << "/tmp/pman.caraveldb";
-	else
-	  filenameS << "/tmp" << "/" <<  m_pkgName << ".caravel";
+    } else {
+      if(!m_UseTemp)
+        filenameS << getenv("HOME") <<  "/" <<  m_pkgName << ".caravel";
+      else
+        filenameS << "/tmp" << "/" <<  m_pkgName << ".caravel";
+    }
 	CURLcode res;
 	fp = fopen(filenameS.str().c_str(), "wb");
     indicators::show_console_cursor(false);

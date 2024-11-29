@@ -1,7 +1,6 @@
 
 #include <archive.h>
 #include <archive_entry.h>
-#include "CaravelUtils.h"
 #include "CaravelWriter.h"
 #include <sstream>
 #include <vector>
