@@ -18,6 +18,7 @@ void CaravelPM::CaravelSession::Load()
         m_Repository = new CaravelPM::CaravelRepository(repository);
     }
     loader->loadAllTypes();
+    logger = new CaravelPM::Logger("/var/log/caravel.log");
 }
 
 std::string CaravelPM::CaravelSession::GetPackagePath(std::string packageType)
@@ -43,39 +44,49 @@ void CaravelPM::CaravelSession::Create(std::string packageDir, CaravelPM::Carave
 {
     CaravelPM::CaravelAuthor::CreatePackage(packageDir,packageType.name,propMap,loader);
 }
+void CaravelPM::CaravelSession::uninstallPackage(std::string uninstallScriptPath){
+    std::string uninstallScript = uninstallScriptPath;
+    std::filesystem::path ulPath(uninstallScript);
+
+    CaravelPM::CaravelContext* context = new CaravelPM::CaravelContext(ulPath.string());
+    context->Run(logger);
+    delete context;
+}
+
+
 
 bool CaravelPM::CaravelSession::ReadAndInstall(std::string pathString, std::string packageFile)
 {
-     CaravelPM::CaravelReader* reader = new CaravelPM::CaravelReader(pathString,packageFile, loader);
+     CaravelPM::CaravelReader* reader = new CaravelPM::CaravelReader(pathString,packageFile, loader, logger);
           if(!reader->Extract()){
-            std::cerr << "Can't extract package." << std::endl;
+               writeToLog(CaravelPM::LogLevel::ERROR, "Can't extract package.");
             return false;
           }
           if(reader->hasHybridType()){
-             std::cout << "Hybrid package detected. Caravel will reinstall this package." << std::endl;
-             std::string uninstallScript(std::string(std::string("/tmp/ccontainer/uninstall.lua")));
-             std::filesystem::path ulPath(uninstallScript);
-
-             CaravelPM::CaravelContext* context = new CaravelPM::CaravelContext(ulPath.string());
-             context->Run();
-             delete context;
+              writeToLog(CaravelPM::LogLevel::INFO, "Hybrid package detected. Caravel will reinstall this package.");
+             uninstallPackage("/tmp/ccontainer/uninstall.lua");
           }
           if(!reader->Install()){
-            std::cerr << "Can't install package " << reader->GetMetadata("name") << std::endl;
+              writeToLog(CaravelPM::LogLevel::ERROR, "Can't install package " + reader->GetMetadata("name"));
             return false;
           }
-          std::cout << "Done." << std::endl;
+          writeToLog(CaravelPM::LogLevel::INFO, "Done.");
           delete reader;
           return true;
 }
 
 CaravelPM::CaravelReader * CaravelPM::CaravelSession::getReader(std::string pathString, std::string packageFile)
 {
-    return new CaravelPM::CaravelReader(pathString, packageFile, loader);
+    return new CaravelPM::CaravelReader(pathString, packageFile, loader, logger);
 }
 
 std::string CaravelPM::CaravelSession::GetRepoUrl()
 {
     return m_Repository->DownloadURI();
+}
+
+void CaravelPM::CaravelSession::writeToLog(CaravelPM::LogLevel level, std::string msg)
+{
+    return logger->write(level,msg);
 }
 

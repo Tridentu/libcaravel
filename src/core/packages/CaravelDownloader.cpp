@@ -20,7 +20,6 @@ namespace CaravelPM {
       urlS <<  repo << pkgSpace << pkg << ".caravel";
     else
       urlS << repo << "/pman.caraveldb";
-   std::cout << urlS.str() << std::endl;
     m_HandleHttp = curl_easy_init();
     curl_easy_setopt(m_HandleHttp,CURLOPT_URL,urlS.str().c_str());
     

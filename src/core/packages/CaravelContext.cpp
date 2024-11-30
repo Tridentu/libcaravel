@@ -24,6 +24,8 @@ static std::string  RunCommand(const char* command){
     return result;								      
 }
 
+static CaravelPM::Logger* s_logger;
+
 extern "C" {
 
  
@@ -139,7 +141,23 @@ extern "C" {
   }
 
   static int _caravel_ctx_print(lua_State* ls){
-    std::cout << lua_tostring(ls, 1) << std::endl;
+    if (s_logger){
+      s_logger->write(CaravelPM::LogLevel::INFO, lua_tostring(ls, 1));
+    } else {
+      std::cout << lua_tostring(ls, 1) << std::endl;
+
+    }
+    return 0;
+  }
+
+
+  static int _caravel_ctx_warn(lua_State* ls){
+    if (s_logger){
+      s_logger->write(CaravelPM::LogLevel::WARNING, lua_tostring(ls, 1));
+    } else {
+      std::cout << lua_tostring(ls, 1) << std::endl;
+
+    }
     return 0;
   }
 
@@ -168,6 +186,8 @@ namespace CaravelPM {
     m_CaravelLib->AddCFunction("installDCpy", _caravel_ctx_installdcpy);
     m_CaravelLib->AddCFunction("patchMode", _caravel_ctx_patch_mode);
     m_CaravelLib->AddCFunction("print", _caravel_ctx_print);
+    m_CaravelLib->AddCFunction("warn", _caravel_ctx_warn);
+
     m_CaravelLib->AddCFunction("confirm", _caravel_ctx_confirm);
     std::shared_ptr<Engine::LuaTString> homeDir = std::make_shared<Engine::LuaTString>(std::string(getenv("HOME")));
     lua.AddGlobalVariable("homeDir", homeDir);
@@ -186,12 +206,15 @@ namespace CaravelPM {
     }
   }
 
-  bool  CaravelContext::Run(){
+  bool  CaravelContext::Run(CaravelPM::Logger* logger){
+    if(logger){
+      s_logger = logger;
+    }
     lua.CompileString("manager",m_FileContents);
     try {
       lua.Run("manager");
     } catch (std::runtime_error& e) {
-      std::cerr << "Lua script failed: " << e.what() << std::endl;
+      std::cerr << "Lua hook failed: " << e.what() << std::endl;
       return false;
     }
     return true;

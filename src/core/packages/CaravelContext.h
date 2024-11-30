@@ -2,6 +2,7 @@
 #pragma once
 
 #include <LuaCpp/LuaCpp.hpp>
+#include "../CaravelLogger.h"
 
 using namespace LuaCpp;
 using namespace LuaCpp::Registry;
@@ -13,7 +14,7 @@ namespace CaravelPM {
     public:
       CaravelContext(std::string file);
       ~CaravelContext();
-      bool Run();
+      bool Run(CaravelPM::Logger* logger);
     private:
       LuaContext lua;
       std::shared_ptr<LuaLibrary> m_CaravelLib;

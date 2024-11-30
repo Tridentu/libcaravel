@@ -6,6 +6,7 @@
 #include <archive_entry.h>
 #include <map>
 #include "../CaravelUtils.h"
+#include "../CaravelLogger.h"
 
 namespace CaravelPM {
   
@@ -14,6 +15,7 @@ namespace CaravelPM {
   class CaravelReader {
   public:
     CaravelReader(std::string pkgFile, std::string name, CaravelTypeLoader* newLoader);
+    CaravelReader(std::string pkgFile, std::string name, CaravelTypeLoader* newLoader, CaravelPM::Logger* logger);
     bool Extract();
     bool  Install();
     int CopyFile(struct archive* a, struct archive *w);
@@ -32,5 +34,7 @@ namespace CaravelPM {
     std::string m_Type;
     std::string m_BuildType = "regular";
     CaravelTypeLoader* m_Loader;
+    Logger* m_logger;
+
   };
 }

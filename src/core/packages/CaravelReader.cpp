@@ -37,6 +37,13 @@ namespace CaravelPM {
     m_Loader = newLoader;
   }
 
+  CaravelReader::CaravelReader(std::string pkgFile, std::string name, CaravelTypeLoader* newLoader, CaravelPM::Logger* logger){
+    m_File = pkgFile;
+    m_Name = name;
+    m_Loader = newLoader;
+    m_logger = logger;
+  }
+
   std::string CaravelReader::RunCommand(const char* command){
     std::array<char, 128> buffer;
     std::string result;
@@ -71,7 +78,6 @@ namespace CaravelPM {
     
     std::stringstream cmd;
     cmd <<  (containerPath / m_Name ).string();
-    std::cout << "Extracting " << cmd.str() << "...\n";
     {
       int r;
       archive_entry* entry;
@@ -100,7 +106,7 @@ namespace CaravelPM {
 	      std::cerr << archive_error_string(m_ArchiveWrite) << std::endl;
 	  if (r < ARCHIVE_WARN)
 	    return false;
-	  
+
 	}
 	r = archive_write_finish_entry(m_ArchiveWrite);
 	if (r < ARCHIVE_OK)
@@ -132,8 +138,11 @@ namespace CaravelPM {
 	return (r);
       r = archive_write_data_block(w, buff, size, offset);
       if (r < ARCHIVE_OK){
-	std::cerr << archive_error_string(w) << std::endl;
-	return r;
+        if(m_logger)
+          m_logger->write(CaravelPM::LogLevel::CRITICAL, archive_error_string(w));
+        else
+          std::cerr << archive_error_string(w) << std::endl;
+        return r;
       }
     }
   }
@@ -143,7 +152,10 @@ namespace CaravelPM {
     folder += "/ccontainer/";
     std::filesystem::path installPath(folder + "install.lua");
     if(!std::filesystem::exists(installPath)){
-      std::cerr << "Install script does not exist, exiting..." << std::endl;
+      if(m_logger)
+        m_logger->write(CaravelPM::LogLevel::ERROR, "Install script does not exist, exiting...");
+      else
+        std::cerr << "Install script does not exist, exiting..." << std::endl;
       return false;
     }
 
@@ -155,7 +167,10 @@ namespace CaravelPM {
 
     INIReader reader(pathStr);
     if(reader.ParseError() < 0){
-      std::cerr << "Can't load manifest." << std::endl;
+      if(m_logger)
+        m_logger->write(CaravelPM::LogLevel::ERROR, "Can't load manifest.");
+      else
+        std::cerr << "Can't load manifest." << std::endl;
       return false;
     }
 
@@ -163,11 +178,15 @@ namespace CaravelPM {
     m_BuildType = reader.GetString("caravel","buildType","regular");
 
     CaravelContext* ctx = new CaravelContext(installPath.string());
-    ctx->Run();
+    ctx->Run(m_logger);
     auto packageType = m_Loader->getPackageType(m_Type);
     std::filesystem::path uninstallPath(folder + "uninstall.lua");
     if (!std::filesystem::exists(uninstallPath)){
-          std::cerr << "Uninstaller does not exist, exiting..." << std::endl;
+      if(m_logger)
+        m_logger->write(CaravelPM::LogLevel::ERROR, "Uninstaller does not exist, exiting...");
+      else
+        std::cerr << "Uninstaller does not exist, exiting..." << std::endl;
+
       return false;
     }
     return packageType.processInstallUninstaller(reader.GetString("caravel","name","unknown"), uninstallPath);
@@ -178,8 +197,10 @@ namespace CaravelPM {
   CaravelReader::~CaravelReader(){
     const std::filesystem::path tmp = std::filesystem::path(std::string(getenv("HOME")));
     std::uintmax_t contents = std::filesystem::remove_all(tmp / "ccontainer");
-    std::cout << "Either installed " << contents - 3 << " files or nothing happened.";
-    
+    if(m_logger)
+      m_logger->write(CaravelPM::LogLevel::INFO, "Either the package was installed  or nothing happened.");
+    else
+      std::cout << "Either the package was installed  or nothing happened." << std::endl;
   }
 
 
