@@ -27,7 +27,7 @@ namespace CaravelPM {
 
   public:
     CaravelDownloader(std::string pkg, std::string repo, bool useDatabase = false, bool useTempFolder = false, std::string pkgSpace = "/packages/x86_64/");
-    CaravelDownloader(std::string pkg, std::string pkgUrl);
+    CaravelDownloader(std::string pkg, std::string pkgUrl, bool useDatabase = false, std::string pkgSpace = "/packages/x86_64/");
     ~CaravelDownloader();
     void Run();
   private:

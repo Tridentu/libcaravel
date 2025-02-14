@@ -25,7 +25,7 @@ namespace CaravelPM {
     
   };
 
-  CaravelDownloader::CaravelDownloader(std::string pkg,  std::string pkgUrl){
+  CaravelDownloader::CaravelDownloader(std::string pkg,  std::string pkgUrl, bool useDatabase, std::string pkgSpace){
     m_pkgName = pkg;
     isDatabase = false;
     m_HandleHttp = curl_easy_init();
